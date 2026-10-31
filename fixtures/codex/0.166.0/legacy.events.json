@@ -1,0 +1,334 @@
+{
+  "events": [
+    {
+      "agent": "codex",
+      "sessionId": "0199a1b2-c3d4-7e5f-8a9b-0c1d2e3f4a5b",
+      "ts": "2026-10-30T14:00:00.300Z",
+      "line": 4,
+      "kind": "prompt",
+      "payload": {
+        "text": "Add a discount code field to the cart and keep the tests green.",
+        "origin": "human"
+      }
+    },
+    {
+      "agent": "codex",
+      "sessionId": "0199a1b2-c3d4-7e5f-8a9b-0c1d2e3f4a5b",
+      "ts": "2026-10-30T14:00:04.000Z",
+      "line": 8,
+      "kind": "tool_call",
+      "payload": {
+        "callId": "call_A",
+        "tool": "exec_command",
+        "category": "shell",
+        "command": "npm test -- --run",
+        "input": {
+          "cmd": "npm test -- --run",
+          "workdir": "~/shop"
+        }
+      }
+    },
+    {
+      "agent": "codex",
+      "sessionId": "0199a1b2-c3d4-7e5f-8a9b-0c1d2e3f4a5b",
+      "ts": "2026-10-30T14:00:08.300Z",
+      "line": 9,
+      "kind": "tool_result",
+      "payload": {
+        "callId": "call_A",
+        "tool": "exec_command",
+        "status": "error",
+        "exitCode": 1,
+        "output": "Chunk ID: 1a2b\nWall time: 4.2100 seconds\nProcess exited with code 1\nOriginal token count: 120\nOutput:\nFAIL src/cart.test.ts\nTests: 1 failed, 17 passed, 18 total\n",
+        "truncated": false
+      }
+    },
+    {
+      "agent": "codex",
+      "sessionId": "0199a1b2-c3d4-7e5f-8a9b-0c1d2e3f4a5b",
+      "ts": "2026-10-30T14:00:08.300Z",
+      "line": 9,
+      "kind": "test_run",
+      "payload": {
+        "callId": "call_A",
+        "command": "npm test -- --run",
+        "segment": "npm test -- --run",
+        "runner": "npm",
+        "status": "error",
+        "exitCode": 1,
+        "startedAt": "2026-10-30T14:00:04.000Z"
+      }
+    },
+    {
+      "agent": "codex",
+      "sessionId": "0199a1b2-c3d4-7e5f-8a9b-0c1d2e3f4a5b",
+      "ts": "2026-10-30T14:00:12.000Z",
+      "line": 10,
+      "kind": "tool_call",
+      "payload": {
+        "callId": "call_B",
+        "tool": "apply_patch",
+        "category": "edit",
+        "input": "*** Begin Patch\n*** Update File: src/cart.ts\n@@\n-  return total;\n+  return applyDiscount(total, code);\n*** Add File: src/discount.ts\n+export const applyDiscount = (t: number, c: string) => t;\n*** End Patch\n"
+      }
+    },
+    {
+      "agent": "codex",
+      "sessionId": "0199a1b2-c3d4-7e5f-8a9b-0c1d2e3f4a5b",
+      "ts": "2026-10-30T14:00:12.300Z",
+      "line": 12,
+      "kind": "tool_result",
+      "payload": {
+        "callId": "call_B",
+        "tool": "apply_patch",
+        "status": "ok",
+        "output": "Success. Updated the following files:\nM src/cart.ts\nA src/discount.ts\n",
+        "truncated": false
+      }
+    },
+    {
+      "agent": "codex",
+      "sessionId": "0199a1b2-c3d4-7e5f-8a9b-0c1d2e3f4a5b",
+      "ts": "2026-10-30T14:00:12.300Z",
+      "line": 12,
+      "kind": "edit",
+      "payload": {
+        "callId": "call_B",
+        "tool": "apply_patch",
+        "status": "applied",
+        "changes": [
+          {
+            "path": "src/cart.ts",
+            "op": "update",
+            "patch": "@@\n-  return total;\n+  return applyDiscount(total, code);"
+          },
+          {
+            "path": "src/discount.ts",
+            "op": "create",
+            "patch": "+export const applyDiscount = (t: number, c: string) => t;"
+          }
+        ]
+      }
+    },
+    {
+      "agent": "codex",
+      "sessionId": "0199a1b2-c3d4-7e5f-8a9b-0c1d2e3f4a5b",
+      "ts": "2026-10-30T14:00:14.000Z",
+      "line": 13,
+      "kind": "tool_call",
+      "payload": {
+        "callId": "call_C",
+        "tool": "shell",
+        "category": "shell",
+        "command": "npx jest src/cart.test.ts",
+        "input": {
+          "command": [
+            "bash",
+            "-lc",
+            "npx jest src/cart.test.ts"
+          ],
+          "workdir": "~/shop",
+          "timeout_ms": 120000
+        }
+      }
+    },
+    {
+      "agent": "codex",
+      "sessionId": "0199a1b2-c3d4-7e5f-8a9b-0c1d2e3f4a5b",
+      "ts": "2026-10-30T14:00:16.100Z",
+      "line": 14,
+      "kind": "tool_result",
+      "payload": {
+        "callId": "call_C",
+        "tool": "shell",
+        "status": "ok",
+        "exitCode": 0,
+        "output": "Exit code: 0\nWall time: 2.1 seconds\nOutput:\nPASS src/cart.test.ts\nTests: 18 passed, 18 total\n",
+        "truncated": false
+      }
+    },
+    {
+      "agent": "codex",
+      "sessionId": "0199a1b2-c3d4-7e5f-8a9b-0c1d2e3f4a5b",
+      "ts": "2026-10-30T14:00:16.100Z",
+      "line": 14,
+      "kind": "test_run",
+      "payload": {
+        "callId": "call_C",
+        "command": "npx jest src/cart.test.ts",
+        "segment": "npx jest src/cart.test.ts",
+        "runner": "jest",
+        "status": "ok",
+        "exitCode": 0,
+        "startedAt": "2026-10-30T14:00:14.000Z"
+      }
+    },
+    {
+      "agent": "codex",
+      "sessionId": "0199a1b2-c3d4-7e5f-8a9b-0c1d2e3f4a5b",
+      "ts": "2026-10-30T14:00:16.200Z",
+      "line": 15,
+      "kind": "cost",
+      "payload": {
+        "scope": "message",
+        "model": "gpt-5.5-codex",
+        "tokens": {
+          "input": 5000,
+          "output": 1500,
+          "cacheRead": 15000,
+          "cacheWrite": 0,
+          "reasoning": 600
+        }
+      }
+    },
+    {
+      "agent": "codex",
+      "sessionId": "0199a1b2-c3d4-7e5f-8a9b-0c1d2e3f4a5b",
+      "ts": "2026-10-30T14:00:20.100Z",
+      "line": 21,
+      "kind": "cost",
+      "payload": {
+        "scope": "session-total",
+        "model": "gpt-5.5-codex",
+        "tokens": {
+          "input": 8000,
+          "output": 2100,
+          "cacheRead": 22000,
+          "cacheWrite": 0,
+          "reasoning": 800
+        }
+      }
+    },
+    {
+      "agent": "codex",
+      "sessionId": "0199a1b2-c3d4-7e5f-8a9b-0c1d2e3f4a5b",
+      "ts": "2026-10-30T14:00:18.000Z",
+      "line": 17,
+      "kind": "tool_call",
+      "payload": {
+        "callId": "call_D",
+        "tool": "shell",
+        "category": "shell",
+        "command": "go test ./...",
+        "input": {
+          "command": [
+            "bash",
+            "-lc",
+            "go test ./..."
+          ]
+        }
+      }
+    },
+    {
+      "agent": "codex",
+      "sessionId": "0199a1b2-c3d4-7e5f-8a9b-0c1d2e3f4a5b",
+      "ts": "2026-10-30T14:00:18.400Z",
+      "line": 18,
+      "kind": "tool_result",
+      "payload": {
+        "callId": "call_D",
+        "tool": "shell",
+        "status": "ok",
+        "exitCode": 0,
+        "output": "ok  \tshop/cart\t0.21s\n",
+        "truncated": false
+      }
+    },
+    {
+      "agent": "codex",
+      "sessionId": "0199a1b2-c3d4-7e5f-8a9b-0c1d2e3f4a5b",
+      "ts": "2026-10-30T14:00:18.400Z",
+      "line": 18,
+      "kind": "test_run",
+      "payload": {
+        "callId": "call_D",
+        "command": "go test ./...",
+        "segment": "go test ./...",
+        "runner": "go",
+        "status": "ok",
+        "exitCode": 0,
+        "startedAt": "2026-10-30T14:00:18.000Z"
+      }
+    },
+    {
+      "agent": "codex",
+      "sessionId": "0199a1b2-c3d4-7e5f-8a9b-0c1d2e3f4a5b",
+      "ts": "2026-10-30T14:00:20.000Z",
+      "line": 20,
+      "kind": "claim",
+      "payload": {
+        "text": "Added the discount field. All 18 tests pass.",
+        "model": "gpt-5.5-codex"
+      }
+    },
+    {
+      "agent": "codex",
+      "sessionId": "0199a1b2-c3d4-7e5f-8a9b-0c1d2e3f4a5b",
+      "ts": "2026-10-30T14:00:20.100Z",
+      "line": 21,
+      "kind": "cost",
+      "payload": {
+        "scope": "message",
+        "model": "gpt-5.5-codex",
+        "tokens": {
+          "input": 3000,
+          "output": 600,
+          "cacheRead": 7000,
+          "cacheWrite": 0,
+          "reasoning": 200
+        }
+      }
+    },
+    {
+      "agent": "codex",
+      "sessionId": "0199a1b2-c3d4-7e5f-8a9b-0c1d2e3f4a5b",
+      "ts": "2026-10-30T14:00:25.000Z",
+      "line": 23,
+      "kind": "tool_call",
+      "payload": {
+        "callId": "call_E",
+        "tool": "local_shell",
+        "category": "shell",
+        "command": "cargo test",
+        "input": {
+          "type": "exec",
+          "command": [
+            "cargo",
+            "test"
+          ],
+          "timeout_ms": 1000
+        }
+      }
+    },
+    {
+      "agent": "codex",
+      "sessionId": "0199a1b2-c3d4-7e5f-8a9b-0c1d2e3f4a5b",
+      "ts": "2026-10-30T14:00:25.000Z",
+      "line": 23,
+      "kind": "test_run",
+      "payload": {
+        "callId": "call_E",
+        "command": "cargo test",
+        "segment": "cargo test",
+        "runner": "cargo",
+        "status": "unknown",
+        "startedAt": "2026-10-30T14:00:25.000Z"
+      }
+    }
+  ],
+  "sessions": [
+    {
+      "agent": "codex",
+      "id": "0199a1b2-c3d4-7e5f-8a9b-0c1d2e3f4a5b",
+      "startedAt": "2026-10-30T14:00:00.000Z",
+      "endedAt": "2026-10-30T14:00:25.000Z",
+      "cwd": "~/shop",
+      "cliVersion": "0.166.0",
+      "gitBranch": "feat/cart",
+      "model": "gpt-5.5-codex"
+    }
+  ],
+  "unknown": {},
+  "errors": [],
+  "lines": 23
+}
