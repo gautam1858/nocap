@@ -129,7 +129,7 @@ export function renderCardSvg(analysis: SessionAnalysis, options: CardOptions = 
         text(
           PAD + 80,
           13,
-          esc(`↳ ${clip(ev, COLS - 20)}`),
+          esc(`↪ ${clip(ev, COLS - 20)}`),
           `fill="${theme.muted}" font-size="12.5"`,
         ),
         20,

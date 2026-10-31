@@ -55,7 +55,7 @@ export const commands: readonly Command[] = [
       'Writes a self-contained SVG card (no fonts, scripts or network). PNG needs\n' +
       'rsvg-convert, resvg or Chrome/Chromium installed; without one, the SVG is\n' +
       'still written. The card carries no prompt text, file contents or home paths.',
-    run: async (args, io) => (await import('./commands/card.js')).cardCommand(args, io),
+    run: async (args, io) => await (await import('./commands/card.js')).cardCommand(args, io),
   },
   {
     name: 'doctor',

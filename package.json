@@ -1,14 +1,18 @@
 {
   "name": "nocap",
-  "version": "0.0.0",
-  "description": "A local-only black box for AI coding agents. Checks what your agent claimed against what it actually did.",
+  "version": "0.1.0",
+  "description": "A local black box for coding agents. Checks what your agent claimed against what it actually did, blocks destructive commands, and files a Probable Cause report. 100% local.",
   "keywords": [
     "claude-code",
     "codex",
     "coding-agent",
+    "ai-agent",
     "audit",
     "hooks",
-    "black-box"
+    "black-box",
+    "testwash",
+    "polygraph",
+    "ntsb"
   ],
   "license": "MIT",
   "repository": {
@@ -20,7 +24,8 @@
     "nocap": "dist/cli/index.js"
   },
   "files": [
-    "dist"
+    "dist",
+    "assets"
   ],
   "engines": {
     "node": ">=22.15.0"
@@ -33,7 +38,9 @@
     "format:check": "prettier --check . --ignore-path .gitignore --ignore-path .prettierignore --ignore-path .git/info/exclude",
     "test": "vitest run",
     "check": "npm run lint && npm run format:check && npm run typecheck && npm test",
-    "assets": "node scripts/assets/render.mjs"
+    "assets": "node scripts/assets/render.mjs",
+    "prepublishOnly": "npm run build",
+    "prepack": "npm run build"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
@@ -44,5 +51,16 @@
     "typescript": "~6.0.3",
     "typescript-eslint": "^8.72.1",
     "vitest": "^5.0.5"
+  },
+  "dependencies": {
+    "@resvg/resvg-wasm": "2.6.2"
+  },
+  "author": "Gautam",
+  "homepage": "https://github.com/gautam1858/nocap#readme",
+  "bugs": {
+    "url": "https://github.com/gautam1858/nocap/issues"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

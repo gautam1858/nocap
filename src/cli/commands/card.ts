@@ -60,7 +60,7 @@ function outPath(base: string, dir: string, ext: string, override: string | unde
     : resolved.replace(/\.(svg|png|html|txt)$/, '') + `.${ext}`;
 }
 
-export function cardCommand(args: readonly string[], io: Io): number {
+export async function cardCommand(args: readonly string[], io: Io): Promise<number> {
   const parsed = parse(args, io);
   if (typeof parsed === 'number') return parsed;
   const { session, options } = parsed;
@@ -113,7 +113,7 @@ export function cardCommand(args: readonly string[], io: Io): number {
   let pngNote: string | undefined;
   if (options.png) {
     const pngPath = outPath(docket.number, dir, 'png', options.out);
-    const result = svgToPng(svg, pngPath, environment.env);
+    const result = await svgToPng(svg, pngPath, environment.env);
     if (result.ok) written.push({ label: 'png', path: pngPath });
     else pngNote = result.reason;
   }
