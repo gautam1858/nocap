@@ -220,13 +220,47 @@ Formats drift. Run `nocap doctor` after an agent update; if it reports unrecogni
 [open an issue](https://github.com/gautam1858/nocap/issues) with the type names and versions
 (never the content).
 
+## Use it in a Claude Code plugin
+
+```
+/plugin marketplace add gautam1858/nocap
+/plugin install nocap@nocap
+```
+
+Gives you `/nocap` (audit this session and render the card) and `/nocap-guard`
+(install the guard), plus the guard hook on every tool call. Needs `nocap` on
+your PATH (`npm i -g nocap`). See [plugin/README.md](plugin/README.md).
+
+## Review pull requests in CI
+
+`nocap review` reads a diff and flags tests that were skipped, deleted or
+weakened — no session needed, so it runs in CI. Drop this into a workflow to get
+a sticky comment on every PR:
+
+```yaml
+permissions:
+  contents: read
+  pull-requests: write
+jobs:
+  nocap:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - uses: gautam1858/nocap/.github/actions/nocap-review@main
+```
+
+Or locally: `git diff main... | npx nocap review`. Like everything else, it only
+reads the diff and opens no network connection.
+
 ## Roadmap
 
 - [x] Ingest + archive: adapters, redaction, SQLite + FTS5 index, `archive`, `doctor`
 - [x] Polygraph + testwash: claim extraction, verdicts, test-integrity grading, `audit`
 - [x] Guard: one fail-closed hook for Claude Code and Codex
 - [x] The Probable Cause card + `nocap wrapped`
-- [ ] Publish to npm and the plugin marketplaces; a Claude Code `/nocap` slash command
+- [x] A Claude Code plugin with `/nocap`, and a PR-review GitHub Action
+- [ ] Publish to npm (`npx nocap`) and the plugin marketplaces
 - [ ] Cursor, Gemini CLI and OpenCode adapters; a published precision table on labelled sessions
 
 See [INCIDENTS.md](INCIDENTS.md) for the kinds of failures nocap is built to catch, and
