@@ -44,6 +44,18 @@ export const commands: readonly Command[] = [
     name: 'card',
     summary: 'Render a Probable Cause card for a session',
     usage: 'nocap card [session] [options]',
+    options: [
+      ['[session]', 'A session id or unique prefix; defaults to the most recent'],
+      ['--light, --dark', 'Theme (default dark)'],
+      ['--share', 'Also write a PNG and a ready-to-post one-liner'],
+      ['--png, --html', 'Also write a PNG / HTML copy'],
+      ['--out <path>', 'Write to this path instead of ./<docket>.svg'],
+    ],
+    details:
+      'Writes a self-contained SVG card (no fonts, scripts or network). PNG needs\n' +
+      'rsvg-convert, resvg or Chrome/Chromium installed; without one, the SVG is\n' +
+      'still written. The card carries no prompt text, file contents or home paths.',
+    run: async (args, io) => (await import('./commands/card.js')).cardCommand(args, io),
   },
   {
     name: 'doctor',
@@ -86,7 +98,11 @@ export const commands: readonly Command[] = [
   {
     name: 'wrapped',
     summary: 'Summarise a week, month or year of agent sessions',
-    usage: 'nocap wrapped [week|month|year]',
+    usage: 'nocap wrapped [week|month|year|all] [--json]',
+    options: [['--json', 'Print the summary as JSON']],
+    details:
+      'Totals flights, spend, claims audited and caught, testwash and near misses across a period.',
+    run: async (args, io) => (await import('./commands/wrapped.js')).wrappedCommand(args, io),
   },
 ];
 

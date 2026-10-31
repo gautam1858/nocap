@@ -2,6 +2,8 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { runCli } from '../support/cli.js';
 import { createHome, PLANTED_SECRETS, allBytes, type TestHome } from '../support/home.js';
 import { TRIPWIRE_MARKER } from '../support/network-tripwire.mjs';
+import { mkdtempSync, readdirSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
 let t: TestHome;
@@ -85,5 +87,32 @@ describe('nocap audit, end to end', () => {
     const analyses = JSON.parse(result.stdout) as { verdicts: Record<string, number> }[];
     expect(Array.isArray(analyses)).toBe(true);
     expect(analyses[0]?.verdicts).toHaveProperty('BACKED');
+  });
+});
+
+describe('nocap card and wrapped, end to end', () => {
+  it('writes an SVG card for the latest session', () => {
+    runCli(['archive'], { home: t.home });
+    const dir = mkdtempSync(join(tmpdir(), 'nocap-card-'));
+    try {
+      const result = runCli(['card', '--out', join(dir, 'card.svg')], { home: t.home });
+      expect(result.stderr).not.toContain(TRIPWIRE_MARKER);
+      expect(result.stdout).toContain('PROBABLE CAUSE:');
+      expect(readdirSync(dir).some((f) => f.endsWith('.svg'))).toBe(true);
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
+  it('summarises with wrapped', () => {
+    runCli(['archive'], { home: t.home });
+    const result = runCli(['wrapped', 'all'], { home: t.home });
+    expect(result.stderr).not.toContain(TRIPWIRE_MARKER);
+    expect(result.stdout).toContain('nocap wrapped');
+    expect(result.stdout).toContain('claims');
+  });
+
+  it('rejects an unknown wrapped period', () => {
+    expect(runCli(['wrapped', 'decade'], { home: t.home }).status).toBe(2);
   });
 });
