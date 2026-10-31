@@ -2,7 +2,7 @@ import { chmodSync, existsSync, mkdirSync } from 'node:fs';
 import { dirname } from 'node:path';
 import { DatabaseSync } from 'node:sqlite';
 import type { ParseResult } from '../adapters/types.js';
-import type { AgentId, NocapEvent } from '../core/event.js';
+import type { AgentId, NocapEvent, SessionInfo } from '../core/event.js';
 import { MIGRATIONS } from './schema.js';
 
 export interface SourceRow {
@@ -238,7 +238,76 @@ export class Store {
     });
   }
 
+  /** Sessions in the index, most recently active first. */
+  sessions(): SessionRow[] {
+    return this.db
+      .prepare(
+        'SELECT agent, id, cwd, cli_version, model, git_branch, started_at, ended_at FROM sessions ORDER BY coalesce(ended_at, started_at) DESC, id',
+      )
+      .all() as unknown as SessionRow[];
+  }
+
+  session(agent: AgentId, id: string): SessionRow | undefined {
+    return this.db
+      .prepare(
+        'SELECT agent, id, cwd, cli_version, model, git_branch, started_at, ended_at FROM sessions WHERE agent = ? AND id = ?',
+      )
+      .get(agent, id) as SessionRow | undefined;
+  }
+
+  /** Rebuilds the normalised events for a session, in file order, across every source that holds it. */
+  eventsForSession(agent: AgentId, sessionId: string): NocapEvent[] {
+    const rows = this.db
+      .prepare(
+        'SELECT line, ts, kind, sidechain, payload FROM events WHERE agent = ? AND session_id = ? ORDER BY ts, source_id, seq',
+      )
+      .all(agent, sessionId) as unknown[] as EventRow[];
+    return rows.map((row) => {
+      const base = {
+        ts: row.ts,
+        agent,
+        sessionId,
+        line: row.line,
+        payload: JSON.parse(row.payload) as never,
+        ...(row.sidechain ? { sidechain: true as const } : {}),
+      };
+      return { ...base, kind: row.kind };
+    });
+  }
+
   close(): void {
     this.db.close();
   }
+}
+
+export interface SessionRow {
+  readonly agent: AgentId;
+  readonly id: string;
+  readonly cwd: string | null;
+  readonly cli_version: string | null;
+  readonly model: string | null;
+  readonly git_branch: string | null;
+  readonly started_at: string | null;
+  readonly ended_at: string | null;
+}
+
+interface EventRow {
+  readonly line: number;
+  readonly ts: string;
+  readonly kind: NocapEvent['kind'];
+  readonly sidechain: number;
+  readonly payload: string;
+}
+
+export function sessionInfoFromRow(row: SessionRow): SessionInfo {
+  return {
+    agent: row.agent,
+    id: row.id,
+    ...(row.cwd !== null ? { cwd: row.cwd } : {}),
+    ...(row.cli_version !== null ? { cliVersion: row.cli_version } : {}),
+    ...(row.model !== null ? { model: row.model } : {}),
+    ...(row.git_branch !== null ? { gitBranch: row.git_branch } : {}),
+    ...(row.started_at !== null ? { startedAt: row.started_at } : {}),
+    ...(row.ended_at !== null ? { endedAt: row.ended_at } : {}),
+  };
 }
