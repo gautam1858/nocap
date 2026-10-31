@@ -31,3 +31,17 @@ export function sum(counts: ReadonlyMap<string, number>): number {
   for (const n of counts.values()) total += n;
   return total;
 }
+
+export function duration(ms: number): string {
+  const s = Math.round(ms / 1000);
+  if (s < 60) return `${String(s)}s`;
+  const m = Math.floor(s / 60);
+  if (m < 60) return `${String(m)}m ${String(s % 60)}s`;
+  const h = Math.floor(m / 60);
+  return `${String(h)}h ${String(m % 60)}m`;
+}
+
+export function clockTime(ts: string): string {
+  const t = ts.slice(11, 19);
+  return t.length === 8 ? t : ts;
+}

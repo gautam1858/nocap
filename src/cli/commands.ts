@@ -29,6 +29,16 @@ export const commands: readonly Command[] = [
     name: 'audit',
     summary: "Check an agent's claims against what it actually did",
     usage: 'nocap audit [session] [options]',
+    options: [
+      ['[session]', 'A session id or a unique prefix; defaults to the most recent'],
+      ['--all', 'Audit every indexed session'],
+      ['--json', 'Print the analysis as JSON'],
+    ],
+    details:
+      'Extracts claims (tests pass, done, didn’t touch X) and checks each against\n' +
+      'the evidence: last test run, exit code, scope, and edits since. Exits 1 when\n' +
+      'it finds a contradicted or stale claim, test tampering, or a near miss.',
+    run: async (args, io) => (await import('./commands/audit.js')).auditCommand(args, io),
   },
   {
     name: 'card',

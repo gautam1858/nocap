@@ -58,3 +58,32 @@ describe('nocap archive and doctor, end to end', () => {
     }
   });
 });
+
+describe('nocap audit, end to end', () => {
+  it('errors cleanly before anything is archived', () => {
+    const t2 = createHome();
+    try {
+      const result = runCli(['audit'], { home: t2.home });
+      expect(result.status).toBe(1);
+      expect(result.stderr).toContain('Run');
+    } finally {
+      t2.cleanup();
+    }
+  });
+
+  it('audits the most recent session after archiving', () => {
+    runCli(['archive'], { home: t.home });
+    const result = runCli(['audit'], { home: t.home });
+    expect(result.stderr).not.toContain(TRIPWIRE_MARKER);
+    expect(result.stdout).toContain('PROBABLE CAUSE:');
+    expect(result.stdout).toContain('test integrity');
+  });
+
+  it('emits JSON with verdict counts', () => {
+    runCli(['archive'], { home: t.home });
+    const result = runCli(['audit', '--all', '--json'], { home: t.home });
+    const analyses = JSON.parse(result.stdout) as { verdicts: Record<string, number> }[];
+    expect(Array.isArray(analyses)).toBe(true);
+    expect(analyses[0]?.verdicts).toHaveProperty('BACKED');
+  });
+});
