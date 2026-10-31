@@ -38,7 +38,10 @@ export const commands: readonly Command[] = [
   {
     name: 'doctor',
     summary: 'Report agent versions, adapter coverage and unknown event types',
-    usage: 'nocap doctor',
+    usage: 'nocap doctor [--json]',
+    options: [['--json', 'Print the report as JSON']],
+    details: 'Reads every session log in memory and writes nothing. Exits 1 if it finds problems.',
+    run: async (args, io) => (await import('./commands/doctor.js')).doctorCommand(args, io),
   },
   {
     name: 'guard install',
