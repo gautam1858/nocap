@@ -8,7 +8,7 @@ inputs:
     default: ${{ github.token }}
   nocap:
     description: How to invoke nocap. Default uses the published package.
-    default: npx --yes nocap@latest
+    default: npx --yes @anv1858/nocap@latest
   fail-on-findings:
     description: Fail the check when the diff weakens tests.
     default: 'false'

@@ -1,6 +1,6 @@
 ---
 description: Install or check nocap's destructive-command guard
-allowed-tools: Bash(nocap:*), Bash(npx nocap:*)
+allowed-tools: Bash(nocap:*), Bash(npx @anv1858/nocap:*)
 ---
 
 # /nocap-guard

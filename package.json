@@ -1,5 +1,5 @@
 {
-  "name": "nocap",
+  "name": "@anv1858/nocap",
   "version": "0.1.0",
   "description": "A local black box for coding agents. Checks what your agent claimed against what it actually did, blocks destructive commands, and files a Probable Cause report. 100% local.",
   "keywords": [

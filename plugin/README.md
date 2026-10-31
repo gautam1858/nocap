@@ -8,7 +8,7 @@ destructive commands. Everything runs locally; nothing leaves your machine.
 The plugin drives the `nocap` CLI, so install it on your PATH first:
 
 ```bash
-npm i -g nocap
+npm i -g @anv1858/nocap
 ```
 
 ## Install the plugin
@@ -35,7 +35,7 @@ Add this repo as a marketplace, then install:
 - The guard hook runs `nocap guard run` on every tool call, so `nocap` must be
   on your PATH (see the prerequisite). If it isn't found, the hook cannot run
   and tool calls proceed unguarded — run `/nocap-guard` to set up the faster
-  direct hook, or `npm i -g nocap`.
+  direct hook, or `npm i -g @anv1858/nocap`.
 - Turn the guard off any time with `NOCAP_GUARD_OFF=1`, without uninstalling.
 - nocap is read-only on your agent directories and makes no network calls. See
   the [main README](https://github.com/gautam1858/nocap) for how to verify that.

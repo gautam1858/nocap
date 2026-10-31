@@ -111,19 +111,19 @@ so if there were.)
 ## Quick start
 
 ```bash
-npx nocap archive      # keep and index your sessions (redacted)
+npx @anv1858/nocap archive      # keep and index your sessions (redacted)
 ```
 
 ```bash
-npx nocap audit        # audit the most recent one
+npx @anv1858/nocap audit        # audit the most recent one
 ```
 
 ```bash
-npx nocap card --share # render the Probable Cause card (SVG + PNG + a post)
+npx @anv1858/nocap card --share # render the Probable Cause card (SVG + PNG + a post)
 ```
 
 ```bash
-npx nocap guard install   # install the fail-closed guard hook
+npx @anv1858/nocap guard install   # install the fail-closed guard hook
 ```
 
 Or from source: `git clone https://github.com/gautam1858/nocap && cd nocap && npm ci && npm run build`,
@@ -229,7 +229,7 @@ Formats drift. Run `nocap doctor` after an agent update; if it reports unrecogni
 
 Gives you `/nocap` (audit this session and render the card) and `/nocap-guard`
 (install the guard), plus the guard hook on every tool call. Needs `nocap` on
-your PATH (`npm i -g nocap`). See [plugin/README.md](plugin/README.md).
+your PATH (`npm i -g @anv1858/nocap`). See [plugin/README.md](plugin/README.md).
 
 ## Review pull requests in CI
 
@@ -250,7 +250,7 @@ jobs:
       - uses: gautam1858/nocap/.github/actions/nocap-review@main
 ```
 
-Or locally: `git diff main... | npx nocap review`. Like everything else, it only
+Or locally: `git diff main... | npx @anv1858/nocap review`. Like everything else, it only
 reads the diff and opens no network connection.
 
 ## Roadmap
@@ -260,7 +260,7 @@ reads the diff and opens no network connection.
 - [x] Guard: one fail-closed hook for Claude Code and Codex
 - [x] The Probable Cause card + `nocap wrapped`
 - [x] A Claude Code plugin with `/nocap`, and a PR-review GitHub Action
-- [ ] Publish to npm (`npx nocap`) and the plugin marketplaces
+- [ ] Publish to npm (`npx @anv1858/nocap`) and the plugin marketplaces
 - [ ] Cursor, Gemini CLI and OpenCode adapters; a published precision table on labelled sessions
 
 See [INCIDENTS.md](INCIDENTS.md) for the kinds of failures nocap is built to catch, and

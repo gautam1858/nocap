@@ -1,7 +1,7 @@
 ---
 description: Audit this session's claims and render a Probable Cause card
 argument-hint: '[session-id]'
-allowed-tools: Bash(nocap:*), Bash(npx nocap:*)
+allowed-tools: Bash(nocap:*), Bash(npx @anv1858/nocap:*)
 ---
 
 # /nocap
@@ -20,4 +20,4 @@ Do this, then report back — do not ask for confirmation first:
    probable cause. Give me the path to the PNG so I can share it.
 
 If the `nocap` command is not found, tell me to install it with
-`npm i -g nocap`, or to use `npx nocap` in place of `nocap` above.
+`npm i -g @anv1858/nocap`, or to use `npx @anv1858/nocap` in place of `nocap` above.
