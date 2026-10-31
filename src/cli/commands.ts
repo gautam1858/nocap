@@ -5,6 +5,8 @@ export interface Command {
   readonly name: string;
   readonly summary: string;
   readonly usage: string;
+  readonly options?: readonly (readonly [string, string])[];
+  readonly details?: string;
   readonly run?: (args: readonly string[], io: Io) => Promise<number> | number;
 }
 
@@ -13,6 +15,15 @@ export const commands: readonly Command[] = [
     name: 'archive',
     summary: 'Copy agent session logs into the local archive before they expire',
     usage: 'nocap archive [options]',
+    options: [
+      ['--agent <id>', 'Only this agent: claude-code or codex (repeatable)'],
+      ['--dry-run', 'Read and redact everything, write nothing'],
+      ['--json', 'Print the summary as JSON'],
+    ],
+    details:
+      'Copies each session log into ~/.nocap/archive (or $NOCAP_HOME) with secrets\n' +
+      'redacted, then indexes it. Agent directories are only ever read.',
+    run: async (args, io) => (await import('./commands/archive.js')).archiveCommand(args, io),
   },
   {
     name: 'audit',

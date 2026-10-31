@@ -33,8 +33,8 @@ export function runNode(args: readonly string[], env: NodeJS.ProcessEnv = {}): C
  * Runs the built CLI with the network tripwire preloaded and a throwaway home
  * directory, so commands never see the real agent logs on the test machine.
  */
-export function runCli(args: readonly string[]): CliResult {
-  const home = mkdtempSync(join(tmpdir(), 'nocap-test-home-'));
+export function runCli(args: readonly string[], options: { home?: string } = {}): CliResult {
+  const home = options.home ?? mkdtempSync(join(tmpdir(), 'nocap-test-home-'));
   try {
     return runNode([binPath, ...args], {
       HOME: home,
@@ -45,6 +45,6 @@ export function runCli(args: readonly string[]): CliResult {
       NOCAP_HOME: join(home, '.nocap'),
     });
   } finally {
-    rmSync(home, { recursive: true, force: true });
+    if (options.home === undefined) rmSync(home, { recursive: true, force: true });
   }
 }

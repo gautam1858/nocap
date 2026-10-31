@@ -38,7 +38,12 @@ export function renderHelp(): string {
 }
 
 export function renderCommandHelp(command: Command): string {
-  return [`Usage: ${command.usage}`, '', command.summary, ''].join('\n');
+  const lines = [`Usage: ${command.usage}`, '', command.summary];
+  if (command.details) lines.push('', command.details);
+  if (command.options && command.options.length > 0)
+    lines.push('', 'Options:', table(command.options));
+  lines.push('');
+  return lines.join('\n');
 }
 
 export function renderGroupHelp(group: string, subcommands: readonly Command[]): string {

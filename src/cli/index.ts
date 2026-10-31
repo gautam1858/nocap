@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import './suppress-warnings.js';
 import { ExitCode } from './io.js';
 import { run } from './main.js';
 

@@ -66,7 +66,7 @@ describe('nocap CLI', () => {
   });
 
   it('does not treat --help after -- as a help request', async () => {
-    const result = await invoke('archive', '--', '--help');
+    const result = await invoke('audit', '--', '--help');
     expect(result.stdout).toBe('');
     expect(result.status).toBe(1);
   });
