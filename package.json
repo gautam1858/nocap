@@ -1,0 +1,47 @@
+{
+  "name": "nocap",
+  "version": "0.0.0",
+  "description": "A local-only black box for AI coding agents. Checks what your agent claimed against what it actually did.",
+  "keywords": [
+    "claude-code",
+    "codex",
+    "coding-agent",
+    "audit",
+    "hooks",
+    "black-box"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gautam1858/nocap.git"
+  },
+  "type": "module",
+  "bin": {
+    "nocap": "dist/cli/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint .",
+    "format": "prettier --write . --ignore-path .gitignore --ignore-path .prettierignore --ignore-path .git/info/exclude",
+    "format:check": "prettier --check . --ignore-path .gitignore --ignore-path .prettierignore --ignore-path .git/info/exclude",
+    "test": "vitest run",
+    "check": "npm run lint && npm run format:check && npm run typecheck && npm test"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^22.20.5",
+    "eslint": "^10.14.0",
+    "eslint-config-prettier": "^10.1.8",
+    "prettier": "^3.9.10",
+    "typescript": "~6.0.3",
+    "typescript-eslint": "^8.72.1",
+    "vitest": "^5.0.5"
+  }
+}
