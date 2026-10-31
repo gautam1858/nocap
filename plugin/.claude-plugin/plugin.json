@@ -1,0 +1,10 @@
+{
+  "name": "nocap",
+  "version": "0.1.0",
+  "description": "Audit your coding agent's claims against what it actually did, render a Probable Cause card, and block destructive commands. 100% local.",
+  "author": {
+    "name": "gautam1858"
+  },
+  "homepage": "https://github.com/gautam1858/nocap",
+  "keywords": ["audit", "security", "testing", "hooks", "black-box"]
+}

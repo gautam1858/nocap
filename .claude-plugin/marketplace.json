@@ -1,0 +1,14 @@
+{
+  "name": "nocap",
+  "owner": {
+    "name": "gautam1858"
+  },
+  "plugins": [
+    {
+      "name": "nocap",
+      "source": "./plugin",
+      "version": "0.1.0",
+      "description": "Audit your coding agent's claims against what it actually did, render a Probable Cause card, and block destructive commands. 100% local."
+    }
+  ]
+}
