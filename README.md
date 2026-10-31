@@ -52,14 +52,14 @@ what actually happened, and whether your agent was straight with you about it.**
 
 ## What's in the box
 
-| Feature                 | What it does                                                                                                        | Status         |
-| ----------------------- | ------------------------------------------------------------------------------------------------------------------- | -------------- |
-| **Forever archive**     | Copies every session before the agent's 30-day cleanup deletes it. Redacted, indexed, full-text searchable.         | ✅ Works today |
-| **Doctor**              | Agent versions, retention settings, archive status, adapter coverage, and any record type nocap doesn't understand. | ✅ Works today |
-| **Polygraph**           | Pulls claims ("tests pass", "done", "didn't touch X") out of the transcript and checks each against the evidence.   | 🚧 In progress |
-| **Testwash detector**   | Flags tests that were skipped, weakened or deleted after they failed.                                               | 🚧 In progress |
-| **Guard**               | A fail-closed hook that blocks destructive commands, runaway loops and spend spikes, and says why.                  | ⏳ Planned     |
-| **Probable Cause card** | A one-page, screenshot-ready incident report per session.                                                           | ⏳ Planned     |
+| Feature                 | What it does                                                                                                        | Status      |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------- | ----------- |
+| **Forever archive**     | Copies every session before the agent's 30-day cleanup deletes it. Redacted, indexed, full-text searchable.         | ✅ Live     |
+| **Doctor**              | Agent versions, retention settings, archive status, adapter coverage, and any record type nocap doesn't understand. | ✅ Live     |
+| **Polygraph**           | Pulls claims ("tests pass", "done", "didn't touch X") out of the transcript and checks each against the evidence.   | 🚧 Building |
+| **Testwash detector**   | Flags tests that were skipped, weakened or deleted after they failed.                                               | 🚧 Building |
+| **Guard**               | A fail-closed hook that blocks destructive commands, runaway loops and spend spikes, and says why.                  | ⏳ Planned  |
+| **Probable Cause card** | A one-page, screenshot-ready incident report per session.                                                           | ⏳ Planned  |
 
 ## See it work
 

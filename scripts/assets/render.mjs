@@ -351,7 +351,8 @@ function animatedTerminal(scenes) {
   const HOLD = 4.5;
 
   // Plan the timeline: type the command, reveal output line by line, hold, next scene.
-  let t = 0.6;
+  // Start typing almost at once: a visitor should never see an empty window.
+  let t = 0.15;
   const planned = scenes.map((scene) => {
     const start = t;
     const typed = start + scene.command.length * TYPE_PER_CHAR;
@@ -359,7 +360,7 @@ function animatedTerminal(scenes) {
       .split('\n')
       .map((text, i) => ({ text, at: typed + 0.35 + i * LINE_GAP }));
     const end = (lines.at(-1)?.at ?? typed) + HOLD;
-    t = end + 0.4;
+    t = end + 0.15;
     return { ...scene, start, typed, lines, end };
   });
   const total = t;
