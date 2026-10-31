@@ -260,7 +260,7 @@ reads the diff and opens no network connection.
 - [x] Guard: one fail-closed hook for Claude Code and Codex
 - [x] The Probable Cause card + `nocap wrapped`
 - [x] A Claude Code plugin with `/nocap`, and a PR-review GitHub Action
-- [ ] Publish to npm (`npx @anv1858/nocap`) and the plugin marketplaces
+- [x] Publish to npm — [`@anv1858/nocap`](https://www.npmjs.com/package/@anv1858/nocap)
 - [ ] Cursor, Gemini CLI and OpenCode adapters; a published precision table on labelled sessions
 
 See [INCIDENTS.md](INCIDENTS.md) for the kinds of failures nocap is built to catch, and
