@@ -96,6 +96,30 @@ export const commands: readonly Command[] = [
     run: async (args, io) => (await import('./commands/guard.js')).guardStatus(args, io),
   },
   {
+    name: 'guard run',
+    summary: 'Run the guard on a hook payload from stdin (used by the plugin hook)',
+    usage: 'nocap guard run',
+    details:
+      'Reads a PreToolUse/UserPromptSubmit hook payload on stdin and exits 0 (allow)\n' +
+      'or 2 (block). For the fastest hot path, prefer `nocap guard install`, which\n' +
+      'wires a direct node entry instead of going through this command.',
+    run: async (args, io) => (await import('./commands/guard-run.js')).guardRunCommand(args, io),
+  },
+  {
+    name: 'review',
+    summary: 'Review a code diff for test tampering (for CI / PR comments)',
+    usage: 'nocap review [--diff <file>] [--json] [--fail-on-findings]',
+    options: [
+      ['--diff <file>', 'Read the unified diff from a file instead of stdin'],
+      ['--json', 'Print the review as JSON'],
+      ['--fail-on-findings', 'Exit 1 when the diff skips, deletes or weakens tests'],
+    ],
+    details:
+      'Reads a unified git diff and reports tests skipped, deleted or weakened in it,\n' +
+      'as Markdown for a PR comment. Reads only the diff; opens no network connection.',
+    run: async (args, io) => (await import('./commands/review.js')).reviewCommand(args, io),
+  },
+  {
     name: 'wrapped',
     summary: 'Summarise a week, month or year of agent sessions',
     usage: 'nocap wrapped [week|month|year|all] [--json]',
