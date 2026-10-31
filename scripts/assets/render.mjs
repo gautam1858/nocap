@@ -519,7 +519,7 @@ mkdirSync(join(out, 'badges'), { recursive: true });
 for (const [file, label, value, color] of [
   ['network.svg', 'network calls', '0', '#2EA043'],
   ['telemetry.svg', 'telemetry', 'none', '#2EA043'],
-  ['deps.svg', 'runtime deps', '0', '#2EA043'],
+  ['deps.svg', 'runtime deps', '1 · audited', '#2EA043'],
   ['node.svg', 'node', '>= 22.15', '#0969DA'],
   ['license.svg', 'license', 'MIT', '#0969DA'],
 ]) {

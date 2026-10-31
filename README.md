@@ -17,7 +17,7 @@
   <a href="https://github.com/gautam1858/nocap/actions/workflows/ci.yml"><img src="https://github.com/gautam1858/nocap/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <img src="docs/assets/badges/network.svg" alt="network calls: 0">
   <img src="docs/assets/badges/telemetry.svg" alt="telemetry: none">
-  <img src="docs/assets/badges/deps.svg" alt="runtime dependencies: 0">
+  <img src="docs/assets/badges/deps.svg" alt="runtime dependencies: 1, audited">
   <img src="docs/assets/badges/node.svg" alt="node >= 22.15">
   <a href="LICENSE"><img src="docs/assets/badges/license.svg" alt="license: MIT"></a>
 </p>
@@ -110,34 +110,28 @@ so if there were.)
 
 ## Quick start
 
-The npm package is not published yet. From source:
-
 ```bash
-git clone https://github.com/gautam1858/nocap && cd nocap
+npx nocap archive      # keep and index your sessions (redacted)
 ```
 
 ```bash
-npm ci && npm run build
+npx nocap audit        # audit the most recent one
 ```
 
 ```bash
-node dist/cli/index.js archive      # keep and index your sessions (redacted)
+npx nocap card --share # render the Probable Cause card (SVG + PNG + a post)
 ```
 
 ```bash
-node dist/cli/index.js audit        # audit the most recent one
+npx nocap guard install   # install the fail-closed guard hook
 ```
 
-```bash
-node dist/cli/index.js card --share # render the Probable Cause card
-```
+Or from source: `git clone https://github.com/gautam1858/nocap && cd nocap && npm ci && npm run build`,
+then `node dist/cli/index.js <command>`.
 
-```bash
-node dist/cli/index.js guard install   # install the fail-closed guard hook
-```
-
-Requires Node 22.15 or later. No runtime dependencies. (A PNG from `card --share` needs
-`rsvg-convert`, `resvg` or Chrome/Chromium on your PATH; without one, the SVG is still written.)
+Requires Node 22.15 or later. One runtime dependency — a pure-wasm SVG renderer
+(`@resvg/resvg-wasm`) so `card --share` produces a PNG out of the box, offline, with no system
+fonts or external tools. It is loaded from local bytes and never reaches the network (see below).
 
 ## How the polygraph works, and where it stops
 
@@ -173,6 +167,10 @@ nocap reads files full of secrets, so it is built to be boring about them.
   it three ways: a static audit of the syntax tree of every shipped file and every runtime
   dependency; a tripwire that fails the suite if any code path touches a socket, DNS, HTTP or
   `fetch`, even if the error is swallowed; and a run inside an empty network namespace.
+- **The one dependency is audited.** The wasm renderer (`@resvg/resvg-wasm`) contains a single
+  `fetch`, used only to load its wasm from a URL — a path nocap never takes (it passes the wasm
+  bytes from the local file). CI pins and reviews it, keeps auditing it for anything else, and a
+  test renders a PNG under the tripwire to prove that path makes no connection.
 - **Read-only on agent directories.** nocap never modifies, moves or deletes anything under
   `~/.claude` or `~/.codex`. Tests hash both directories before and after every run.
 - **Secrets are redacted before anything is stored:** API keys and tokens in known formats,
