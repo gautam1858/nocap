@@ -13,6 +13,9 @@ process.env.HOME = sandbox;
 process.env.NOCAP_HOME = join(sandbox, '.nocap');
 delete process.env.CLAUDE_CONFIG_DIR;
 delete process.env.CODEX_HOME;
+// Output assertions expect plain text unless a test asks for colour.
+delete process.env.FORCE_COLOR;
+delete process.env.NO_COLOR;
 
 afterEach(() => {
   expect(takeAttempts(), 'code under test attempted network access').toEqual([]);

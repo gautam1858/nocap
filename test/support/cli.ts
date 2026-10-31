@@ -20,10 +20,13 @@ function toResult(result: SpawnSyncReturns<string>): CliResult {
 
 /** Node with the network tripwire preloaded. */
 export function runNode(args: readonly string[], env: NodeJS.ProcessEnv = {}): CliResult {
+  const inherited = { ...process.env };
+  delete inherited.FORCE_COLOR;
+  delete inherited.NO_COLOR;
   return toResult(
     spawnSync(process.execPath, ['--import', tripwirePreload, ...args], {
       encoding: 'utf8',
-      env: { ...process.env, ...env },
+      env: { ...inherited, ...env },
       timeout: 30_000,
     }),
   );
@@ -33,7 +36,10 @@ export function runNode(args: readonly string[], env: NodeJS.ProcessEnv = {}): C
  * Runs the built CLI with the network tripwire preloaded and a throwaway home
  * directory, so commands never see the real agent logs on the test machine.
  */
-export function runCli(args: readonly string[], options: { home?: string } = {}): CliResult {
+export function runCli(
+  args: readonly string[],
+  options: { home?: string; env?: NodeJS.ProcessEnv } = {},
+): CliResult {
   const home = options.home ?? mkdtempSync(join(tmpdir(), 'nocap-test-home-'));
   try {
     return runNode([binPath, ...args], {
@@ -43,6 +49,7 @@ export function runCli(args: readonly string[], options: { home?: string } = {})
       XDG_DATA_HOME: join(home, '.local', 'share'),
       XDG_STATE_HOME: join(home, '.local', 'state'),
       NOCAP_HOME: join(home, '.nocap'),
+      ...options.env,
     });
   } finally {
     if (options.home === undefined) rmSync(home, { recursive: true, force: true });

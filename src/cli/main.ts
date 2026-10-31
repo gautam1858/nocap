@@ -2,6 +2,7 @@ import { version } from '../version.js';
 import { resolveCommand, subcommandsOf } from './commands.js';
 import { renderCommandHelp, renderGroupHelp, renderHelp } from './help.js';
 import { ExitCode, type Io } from './io.js';
+import { styleFor } from './style.js';
 
 function isHelpFlag(arg: string | undefined): boolean {
   return arg === '-h' || arg === '--help';
@@ -19,7 +20,7 @@ function usageError(io: Io, message: string): number {
 
 function help(topic: readonly string[], io: Io): number {
   if (topic.length === 0) {
-    io.stdout.write(renderHelp());
+    io.stdout.write(renderHelp(styleFor(io.stdout)));
     return ExitCode.ok;
   }
   const resolved = resolveCommand(topic);
@@ -40,7 +41,7 @@ export async function run(argv: readonly string[], io: Io): Promise<number> {
   const [first, ...rest] = argv;
 
   if (first === undefined || isHelpFlag(first)) {
-    io.stdout.write(renderHelp());
+    io.stdout.write(renderHelp(styleFor(io.stdout)));
     return ExitCode.ok;
   }
   if (first === '-v' || first === '--version') {

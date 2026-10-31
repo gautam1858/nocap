@@ -1,5 +1,6 @@
 import { version } from '../version.js';
 import { commands, type Command } from './commands.js';
+import { plain, type Style } from './style.js';
 
 type Rows = readonly (readonly [string, string])[];
 
@@ -7,8 +8,8 @@ function columnWidth(...tables: Rows[]): number {
   return Math.max(...tables.flat().map(([left]) => left.length)) + 3;
 }
 
-function table(rows: Rows, width = columnWidth(rows)): string {
-  return rows.map(([left, right]) => `  ${left.padEnd(width)}${right}`).join('\n');
+function table(rows: Rows, width = columnWidth(rows), style: Style = plain): string {
+  return rows.map(([left, right]) => `  ${style.bold(left.padEnd(width))}${right}`).join('\n');
 }
 
 const globalOptions: Rows = [
@@ -16,23 +17,23 @@ const globalOptions: Rows = [
   ['-v, --version', 'Print the version'],
 ];
 
-export function renderHelp(): string {
+export function renderHelp(style: Style = plain): string {
   const commandRows: Rows = commands.map((c) => [c.name, c.summary]);
   const width = columnWidth(commandRows, globalOptions);
   return [
-    `nocap ${version}: a local black box for coding agents`,
-    'Your agent says the tests pass. nocap checks the receipts.',
+    `${style.bold(style.accent(`nocap ${version}`))}: a local black box for coding agents`,
+    style.dim('Your agent says the tests pass. nocap checks the receipts.'),
     '',
-    'Usage: nocap <command> [options]',
+    `${style.bold('Usage:')} nocap <command> [options]`,
     '',
-    'Commands:',
-    table(commandRows, width),
+    style.bold('Commands:'),
+    table(commandRows, width, style),
     '',
-    'Options:',
-    table(globalOptions, width),
+    style.bold('Options:'),
+    table(globalOptions, width, style),
     '',
     "Run 'nocap help <command>' for details on a command.",
-    'nocap runs entirely on this machine and never opens a network connection.',
+    style.dim('nocap runs entirely on this machine and never opens a network connection.'),
     '',
   ].join('\n');
 }
