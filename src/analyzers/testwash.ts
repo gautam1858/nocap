@@ -83,6 +83,52 @@ function changedExpectations(added: readonly string[], removed: readonly string[
   return changes;
 }
 
+export interface RawFinding {
+  readonly kind: TestwashKind;
+  readonly detail: string;
+}
+
+/**
+ * The language-level checks for one change to a test file, shared by the
+ * session analyzer and the PR-diff reviewer. `path` must already be a test file.
+ */
+export function inspectTestChange(
+  path: string,
+  op: 'delete' | 'other',
+  added: readonly string[],
+  removed: readonly string[],
+): RawFinding[] {
+  if (op === 'delete') return [{ kind: 'test-file-deleted', detail: `test file ${path} deleted` }];
+  const findings: RawFinding[] = [];
+
+  const addedSkips = added.filter(isSkip);
+  const removedSkips = removed.filter(isSkip);
+  if (addedSkips.length > removedSkips.length) {
+    findings.push({
+      kind: 'test-skipped',
+      detail: `skip marker added: ${oneLine(addedSkips[0] ?? '')}`,
+    });
+  }
+
+  const expectationChanges = changedExpectations(added, removed);
+  if (expectationChanges.length > 0) {
+    findings.push({
+      kind: 'expected-changed',
+      detail: `expected value changed: ${expectationChanges.join(', ').slice(0, 120)}`,
+    });
+  }
+
+  // Only flag a net loss of assertions beyond what an expected-value change explains.
+  const netRemoved = countAsserts(removed) - countAsserts(added) - expectationChanges.length;
+  if (netRemoved > 0) {
+    findings.push({
+      kind: 'assertions-removed',
+      detail: `${String(netRemoved)} assertion(s) removed`,
+    });
+  }
+  return findings;
+}
+
 export function testwash(events: readonly NocapEvent[], cwd?: string): TestwashFinding[] {
   const findings: TestwashFinding[] = [];
   let failedEarlier = false;
@@ -97,50 +143,21 @@ export function testwash(events: readonly NocapEvent[], cwd?: string): TestwashF
 
     for (const change of edit.payload.changes) {
       if (!isTestFile(change.path)) continue;
-      const sidechain = edit.sidechain === true;
       const path = displayPath(change.path, cwd);
-      const base = {
-        path,
-        ts: edit.ts,
-        line: edit.line,
-        afterFailingRun: failedEarlier,
-        sidechain,
-      };
-
-      if (change.op === 'delete') {
-        findings.push({ ...base, kind: 'test-file-deleted', detail: `test file ${path} deleted` });
-        continue;
-      }
-
       const { added, removed } = changeLines(change);
-      const addedSkips = added.filter(isSkip);
-      const removedSkips = removed.filter(isSkip);
-      if (addedSkips.length > removedSkips.length) {
+      for (const raw of inspectTestChange(
+        path,
+        change.op === 'delete' ? 'delete' : 'other',
+        added,
+        removed,
+      )) {
         findings.push({
-          ...base,
-          kind: 'test-skipped',
-          detail: `skip marker added: ${oneLine(addedSkips[0] ?? '')}`,
-        });
-      }
-
-      const expectationChanges = changedExpectations(added, removed);
-      if (expectationChanges.length > 0) {
-        findings.push({
-          ...base,
-          kind: 'expected-changed',
-          detail: `expected value changed: ${expectationChanges.join(', ').slice(0, 120)}`,
-        });
-      }
-
-      const removedAsserts = countAsserts(removed);
-      const addedAsserts = countAsserts(added);
-      // Only flag a net loss of assertions beyond what an expected-value change explains.
-      const netRemoved = removedAsserts - addedAsserts - expectationChanges.length;
-      if (netRemoved > 0) {
-        findings.push({
-          ...base,
-          kind: 'assertions-removed',
-          detail: `${String(netRemoved)} assertion(s) removed`,
+          ...raw,
+          path,
+          ts: edit.ts,
+          line: edit.line,
+          afterFailingRun: failedEarlier,
+          sidechain: edit.sidechain === true,
         });
       }
     }
