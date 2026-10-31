@@ -72,6 +72,11 @@ const RUNNERS: readonly (readonly [string, RegExp])[] = [
     'npm',
     /^(?:npm|pnpm|yarn|bun)\s+(?:run\s+|run-script\s+)?(?:test|t|tests|test:[\w:.-]+|e2e|spec)(?:\s|$)/,
   ],
+  // Aggregate scripts that conventionally run the suite as part of a wider gate.
+  [
+    'script',
+    /^(?:npm|pnpm|yarn|bun)\s+(?:run\s+)?(?:check|ci|verify|validate)(?::[\w.-]+)?(?:\s|$)/,
+  ],
   ['bun', /^bun\s+test\b/],
   ['vitest', /^(?:(?:npx|pnpx|bunx|yarn|pnpm(?:\s+exec)?)\s+)?vitest\b(?!\s+(?:init|--version)\b)/],
   ['jest', /^(?:(?:npx|pnpx|bunx|yarn|pnpm(?:\s+exec)?)\s+)?jest\b/],
