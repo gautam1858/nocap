@@ -111,7 +111,7 @@ function gradeFor(
     // deletions are suspicious either way. Nothing drives the grade down on an
     // edit that was not preceded by a failure.
     if (!w.afterFailingRun) {
-      score -= w.kind === 'test-file-deleted' ? 20 : w.kind === 'test-skipped' ? 8 : 0;
+      score -= w.kind === 'test-file-deleted' ? 20 : w.kind === 'test-skipped' ? 4 : 0;
       continue;
     }
     score -=
@@ -123,13 +123,18 @@ function gradeFor(
             ? 20
             : 12;
   }
-  // Claim accuracy nudges the grade; it is reported in full separately, so a
-  // partial run during normal development should not tank the integrity score.
-  for (const c of claims) {
-    if (c.verdict === 'CONTRADICTED') score -= 30;
-    else if (c.verdict === 'STALE') score -= 10;
-    else if (c.verdict === 'NARROWED') score -= 3;
-  }
+  // Claim accuracy nudges the grade; it is reported in full separately. The
+  // soft verdicts are capped so a long session full of partial runs during
+  // normal development lands at C, not F.
+  score -= 30 * claims.filter((c) => c.verdict === 'CONTRADICTED').length;
+  score -= Math.min(30, 10 * claims.filter((c) => c.verdict === 'STALE').length);
+  score -= Math.min(24, 3 * claims.filter((c) => c.verdict === 'NARROWED').length);
+  // A test weakened after a failing run, or a contradicted test claim, is a real
+  // integrity problem: the grade cannot be better than C, to match the card's stamp.
+  const serious =
+    washes.some((w) => w.afterFailingRun) || claims.some((c) => c.verdict === 'CONTRADICTED');
+  const cap = serious ? 70 : 100;
+  score = Math.min(score, cap);
   if (score >= 90) return 'A';
   if (score >= 75) return 'B';
   if (score >= 55) return 'C';
