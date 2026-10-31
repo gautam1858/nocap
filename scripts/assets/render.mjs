@@ -208,24 +208,57 @@ function demoHome() {
   return home;
 }
 
+function nocapEnv(home) {
+  return {
+    HOME: home,
+    PATH: `${join(home, '.local/bin')}:/usr/bin:/bin`,
+    FORCE_COLOR: '1',
+    LANG: 'C.UTF-8',
+  };
+}
+
 function nocap(home, ...args) {
   const result = spawnSync(process.execPath, [join(root, 'dist/cli/index.js'), ...args], {
     encoding: 'utf8',
-    env: {
-      HOME: home,
-      PATH: `${join(home, '.local/bin')}:/usr/bin:/bin`,
-      FORCE_COLOR: '1',
-      LANG: 'C.UTF-8',
-    },
+    env: nocapEnv(home),
   });
   if (result.stderr) throw new Error(`nocap ${args.join(' ')} wrote to stderr:\n${result.stderr}`);
   return result.stdout.replace(/\n$/, '');
 }
 
+// The real guard hook deciding on one blocked command, for the guard screenshot.
+function guardBlock(home, command) {
+  const result = spawnSync(process.execPath, [join(root, 'dist/guard/hook.js')], {
+    input: JSON.stringify({
+      hook_event_name: 'PreToolUse',
+      session_id: 'demo',
+      cwd: '/home/dev/acme',
+      tool_name: 'Bash',
+      tool_input: { command },
+    }),
+    encoding: 'utf8',
+    env: nocapEnv(home),
+  });
+  return result.stderr.trim();
+}
+
 const home = demoHome();
+const BASIC = '11111111';
 const archiveOut = nocap(home, 'archive');
 const doctorOut = nocap(home, 'doctor');
+const auditOut = nocap(home, 'audit', BASIC);
+const guardMessage = guardBlock(home, 'railway down --yes');
+const cardSvgDark = readCard(home, 'dark');
+const cardSvgLight = readCard(home, 'light');
 rmSync(home, { recursive: true, force: true });
+
+function readCard(home, theme) {
+  const svgPath = join(tmpdir(), `nocap-card-${theme}.svg`);
+  nocap(home, 'card', BASIC, `--${theme}`, '--out', svgPath);
+  const svg = readFileSync(svgPath, 'utf8');
+  rmSync(svgPath, { force: true });
+  return svg;
+}
 
 // ------------------------------------------------------- ANSI to markup
 
@@ -316,6 +349,22 @@ await shoot(terminal('nocap doctor', doctorOut, 'nocap doctor'), 'doctor.png', '
   width: 1400,
   height: 1300,
 });
+await shoot(terminal('nocap audit', auditOut, 'nocap audit'), 'audit.png', '.stage', {
+  width: 1500,
+  height: 1100,
+});
+
+// Guard block: the agent tries a destructive command and the hook stops it.
+const guardBody = `${prompt('railway down --yes')}\n${htmlLine(`\u001b[31m⛔ ${guardMessage}\u001b[39m`)}\n${htmlLine('\u001b[2m   near miss logged\u001b[22m')}`;
+await shoot(
+  {
+    css: terminalCss,
+    body: `<div class="stage"><div class="window"><div class="bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="title">nocap guard</span></div><pre>${guardBody}</pre></div></div>`,
+  },
+  'guard.png',
+  '.stage',
+  { width: 1400, height: 420 },
+);
 
 // ------------------------------------------------------- animated terminal
 
@@ -422,56 +471,27 @@ writeFileSync(
   ]),
 );
 
-// ------------------------------------------------------ card design preview
+// --------------------------------------------- the real Probable Cause card
 
-const card = {
-  css: `
-  body{margin:0;background:transparent}
-  .stage{display:inline-block;padding:40px;background:linear-gradient(135deg,#1a1d24,#0b0d10)}
-  .card{position:relative;width:860px;background:#F6F2E8;color:#1b1b1b;font:400 15px/1.5 ${MONO};border-radius:6px;box-shadow:0 30px 80px #000a;overflow:hidden;
-    background-image:repeating-linear-gradient(0deg,#0000 0 27px,#00000008 27px 28px)}
-  .head{display:flex;justify-content:space-between;align-items:flex-end;background:${INK};color:#F6F2E8;padding:18px 28px}
-  .head b{font-weight:800;letter-spacing:.14em}.head small{color:#9aa0a6;letter-spacing:.08em}
-  .org{color:${ORANGE};font-weight:800;letter-spacing:.2em;font-size:13px}
-  .body{padding:22px 28px 10px}
-  .row{display:grid;grid-template-columns:170px 120px 1fr;padding:3px 0}
-  .k{color:#6b665c;letter-spacing:.08em}.v{font-weight:700}
-  hr{border:0;border-top:1.5px dashed #b9b2a3;margin:14px 0}
-  .claims{display:flex;gap:26px;font-weight:700;letter-spacing:.06em;margin-bottom:10px}
-  .claims span em{font-style:normal;color:#6b665c;font-weight:400;margin-right:8px}
-  .claim{display:grid;grid-template-columns:96px 1fr 130px;padding:4px 0}
-  .claim .ev{grid-column:2/4;color:#5a554b;font-size:13.5px}
-  .tag{justify-self:end;font-weight:800;letter-spacing:.1em;font-size:13px;padding:1px 8px;border:2px solid}
-  .backed{color:#1f7a35;border-color:#1f7a35}.narrowed{color:#b45309;border-color:#b45309}
-  .cause{background:#ece6d6;border-left:5px solid ${ORANGE};padding:14px 18px;margin:16px 0 18px;font-size:16px}
-  .cause b{letter-spacing:.12em}
-  .stamp{position:absolute;right:44px;top:150px;transform:rotate(-12deg);color:#c2410c;border:4px solid #c2410c;border-radius:6px;padding:4px 16px;font:800 30px ${MONO};letter-spacing:.16em;opacity:.82;mix-blend-mode:multiply}
-  .foot{display:flex;justify-content:space-between;padding:10px 28px 16px;color:#8a8478;font-size:12px;letter-spacing:.06em}
-  .preview{background:${ORANGE};color:${INK};text-align:center;font:800 12.5px ${MONO};letter-spacing:.18em;padding:7px 0}`,
-  body: `<div class="stage"><div class="card">
-  <div class="preview">DESIGN PREVIEW · SAMPLE DATA · NOT YET IMPLEMENTED</div>
-  <div class="head"><div><div class="org">NOCAP · INCIDENT DOCKET</div><b>PROBABLE CAUSE REPORT</b></div><small>NC-261030-0900 · CLAUDE CODE 2.1.316</small></div>
-  <div class="body">
-    <div class="row"><span class="k">FLIGHT</span><span class="v">1m 30s</span><span>09:00:00 → 09:01:30</span></div>
-    <div class="row"><span class="k">COST</span><span class="v">$0.42</span><span>as recorded by the agent</span></div>
-    <div class="row"><span class="k">TOOLS FIRED</span><span class="v">7</span><span>Bash 5 · Edit 1 · Write 1</span></div>
-    <div class="row"><span class="k">FILES TOUCHED</span><span class="v">2</span><span>src/auth.ts · test/clock.test.ts</span></div>
-    <hr>
-    <div class="claims"><span><em>CLAIMS AUDITED</em>2</span><span><em>BACKED</em>1</span><span><em>NARROWED</em>1</span><span><em>CONTRADICTED</em>0</span></div>
-    <div class="claim"><span>09:00:12</span><span>"Fixing it in src/auth.ts."</span><span class="tag backed">BACKED</span>
-      <span class="ev">Edit src/auth.ts applied at 09:00:13</span></div>
-    <div class="claim"><span>09:00:50</span><span>"All tests pass"</span><span class="tag narrowed">NARROWED</span>
-      <span class="ev">last full run: npm test → exit 1 at 09:00:09<br>only pass: vitest run test/auth.test.ts (1 file) → exit 0 at 09:00:19<br>test/clock.test.ts written after that pass, at 09:00:22</span></div>
-    <hr>
-    <div class="row"><span class="k">TEST INTEGRITY</span><span class="v">C</span><span>1 test added already skipped (it.skip)</span></div>
-    <div class="row"><span class="k">NEAR MISSES</span><span class="v">0</span><span>guard not installed</span></div>
-    <div class="cause"><b>PROBABLE CAUSE:</b> The agent reported the suite green on the strength of a single-file run. The last full run failed and was not repeated.</div>
-  </div>
-  <div class="stamp">NARROWED</div>
-  <div class="foot"><span>reenactment of fixtures/claude-code/2.1.316/basic.jsonl (synthetic)</span><span>nocap · 100% local</span></div>
-</div></div>`,
-};
-await shoot(card, 'card-preview.png', '.stage', { width: 1000, height: 1000 });
+async function shootCard(svg, file, bg) {
+  const svgFile = join(tmpdir(), `nocap-card-shot.svg`);
+  const htmlFile = join(tmpdir(), `nocap-card-shot.html`);
+  writeFileSync(svgFile, svg);
+  writeFileSync(
+    htmlFile,
+    `<!doctype html><meta charset="utf-8"><style>body{margin:0;background:${bg};display:inline-block;padding:46px}img{display:block;box-shadow:0 30px 80px #000a;border-radius:6px}</style><img src="file://${svgFile}">`,
+  );
+  await page.setViewportSize({ width: 1000, height: 1200 });
+  await page.goto(`file://${htmlFile}`);
+  await page.locator('img').screenshot({ path: join(out, file) });
+  rmSync(svgFile, { force: true });
+  rmSync(htmlFile, { force: true });
+}
+
+// Both are the actual CLI output for the synthetic basic.jsonl fixture.
+await shootCard(cardSvgDark, 'card.png', 'linear-gradient(135deg,#1a1d24,#0b0d10)');
+await shootCard(cardSvgLight, 'card-light.png', '#e9e4d8');
+rmSync(join(tmpdir(), 'nocap-card.svg'), { force: true });
 
 // ------------------------------------------------------------- badges
 
