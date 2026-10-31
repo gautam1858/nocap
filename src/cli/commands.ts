@@ -56,12 +56,32 @@ export const commands: readonly Command[] = [
   {
     name: 'guard install',
     summary: 'Install the guard hook into agent settings, keeping a backup',
-    usage: 'nocap guard install [options]',
+    usage: 'nocap guard install [--project] [--dry-run]',
+    options: [
+      ['--project', 'Install into the project .claude/settings.json instead of the user one'],
+      ['--dry-run', 'Show what would change without writing'],
+    ],
+    details:
+      'Adds a fail-closed PreToolUse/UserPromptSubmit hook that blocks destructive\n' +
+      'commands, runaway loops, subagent fan-out and dead-man conditions, and logs\n' +
+      'every trip as a near miss. Existing hooks are kept; a backup is written.',
+    run: async (args, io) => (await import('./commands/guard.js')).guardInstall(args, io),
   },
   {
     name: 'guard uninstall',
     summary: 'Remove the guard hook from agent settings',
-    usage: 'nocap guard uninstall [options]',
+    usage: 'nocap guard uninstall [--project] [--dry-run]',
+    options: [
+      ['--project', 'Remove from the project settings instead of the user one'],
+      ['--dry-run', 'Show what would change without writing'],
+    ],
+    run: async (args, io) => (await import('./commands/guard.js')).guardUninstall(args, io),
+  },
+  {
+    name: 'guard status',
+    summary: 'Show whether the guard is installed and recent near misses',
+    usage: 'nocap guard status',
+    run: async (args, io) => (await import('./commands/guard.js')).guardStatus(args, io),
   },
   {
     name: 'wrapped',

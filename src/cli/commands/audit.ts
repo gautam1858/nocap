@@ -2,8 +2,10 @@ import { existsSync } from 'node:fs';
 import { parseArgs } from 'node:util';
 import { analyze, type SessionAnalysis } from '../../analyzers/analyze.js';
 import type { Verdict } from '../../analyzers/polygraph.js';
+import { homedir } from 'node:os';
 import { currentEnvironment } from '../../core/paths.js';
 import { databasePath } from '../../core/paths.js';
+import { nearMissesForSession } from '../../guard/nearmiss.js';
 import { sessionInfoFromRow, Store, type SessionRow } from '../../store/store.js';
 import { clockTime, count, duration, plural } from '../format.js';
 import { ExitCode, type Io } from '../io.js';
@@ -180,8 +182,13 @@ export function auditCommand(args: readonly string[], io: Io): number {
       io.stderr.write(`nocap audit: ${selected.error}\n`);
       return ExitCode.failure;
     }
+    const guardEnv = { home: process.env.HOME ?? homedir(), env: process.env };
     const analyses = selected.map((row) =>
-      analyze(sessionInfoFromRow(row), store.eventsForSession(row.agent, row.id)),
+      analyze(
+        sessionInfoFromRow(row),
+        store.eventsForSession(row.agent, row.id),
+        nearMissesForSession(guardEnv, row.id).length,
+      ),
     );
     if (values.json) {
       io.stdout.write(
